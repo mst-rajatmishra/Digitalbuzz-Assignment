@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Facebook Pages</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .user-info { margin-bottom: 30px; }
+    </style>
+</head>
+<body>
+    <div class="user-info">
+        <h1>Welcome, {{ user.name }}!</h1>
+        <p>You have {{ pages|length }} managed pages:</p>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Page Name</th>
+                <th>Page ID</th>
+                <th>Access Token</th>
+                <th>Permissions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for page in pages %}
+            <tr>
+                <td>{{ page.name }}</td>
+                <td>{{ page.id }}</td>
+                <td style="word-break: break-all;">{{ page.access_token }}</td>
+                <td>{{ page.permissions }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div style="margin-top: 30px;">
+        <h3>API Endpoint</h3>
+        <p>Access your page data in JSON format:</p>
+        <a href="/api/pages">/api/pages</a>
+    </div>
+</body>
+</html>

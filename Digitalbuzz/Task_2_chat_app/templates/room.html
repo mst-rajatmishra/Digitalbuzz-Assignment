@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ room.name }} - Group Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="sidebar">
+            <div class="user-info">
+                <h2>{{ username }}</h2>
+                <button id="back-btn">Back to Rooms</button>
+            </div>
+            
+            <div class="room-info">
+                <h3>Room: {{ room.name }}</h3>
+                <p>Active now: <span id="active-count">1</span></p>
+            </div>
+            
+            <div class="notification-area" id="notification-area">
+                <!-- Notifications will appear here -->
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="chat-header">
+                <h2>{{ room.name }}</h2>
+                <button id="leave-room">Leave Room</button>
+            </div>
+            
+            <div class="chat-messages" id="chat-messages">
+                <!-- Messages will be displayed here -->
+                {% for message in messages %}
+                <div class="message">
+                    <div class="message-header">
+                        <strong>{{ message.user.username }}</strong>
+                        <span>{{ message.timestamp.strftime('%H:%M') }}</span>
+                    </div>
+                    {% if message.content_type == 'text' %}
+                    <p>{{ message.content }}</p>
+                    {% else %}
+                    <img src="{{ message.content }}" alt="Shared image" class="chat-image">
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="message-input">
+                <textarea id="message-input" placeholder="Type your message..."></textarea>
+                <div class="input-actions">
+                    <input type="file" id="image-input" accept="image/*" style="display: none;">
+                    <button id="image-btn">📷</button>
+                    <button id="send-btn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const roomId = {{ room.id }};
+        const userId = {{ user_id }};
+        const username = "{{ username }}";
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initChat(roomId, userId, username);
+        });
+    </script>
+</body>
+</html>
