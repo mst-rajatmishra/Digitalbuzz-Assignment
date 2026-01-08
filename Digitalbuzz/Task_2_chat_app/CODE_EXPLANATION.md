@@ -1009,7 +1009,7 @@ body { background-color: #f0f2f5; height: 100vh; }
     });
 </script>
 ```
-- Add logout functionality (Note: /logout route not implemented in app.py)
+- **Note**: This code attempts to call a `/logout` route that is **not implemented** in app.py. This is a missing feature in the current implementation. The logout button will not work as-is.
 
 ---
 

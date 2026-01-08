@@ -21,7 +21,8 @@ A full-featured group chat application with real-time messaging capabilities.
 - Real-time notifications
 
 **Quick Start:**
-1. Install dependencies: `pip install -r requirements.txt`
-2. Set up database: `python setup_db.py`
-3. Run the application: `python app.py`
-4. Open browser to `http://127.0.0.1:5000`
+1. Navigate to the directory: `cd Digitalbuzz/Task_2_chat_app/`
+2. Install dependencies: `pip install -r requirements.txt`
+3. Set up database: `python setup_db.py`
+4. Run the application: `python app.py`
+5. Open browser to `http://127.0.0.1:5000`
