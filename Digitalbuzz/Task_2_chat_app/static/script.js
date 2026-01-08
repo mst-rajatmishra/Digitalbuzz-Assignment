@@ -43,6 +43,11 @@ function initChat(roomId, userId, username) {
         showNotification(data.message, 'error');
     });
     
+    // Handle user list updates
+    socket.on('user_list_update', function(data) {
+        updateUserList(data.users, data.count);
+    });
+    
     // Scroll to bottom initially
     scrollToBottom();
 }
@@ -145,4 +150,24 @@ function goBackToRooms() {
 function scrollToBottom() {
     const messagesContainer = document.getElementById('chat-messages');
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function updateUserList(users, count) {
+    // Update active count
+    const activeCountEl = document.getElementById('active-count');
+    if (activeCountEl) {
+        activeCountEl.textContent = count;
+    }
+    
+    // Update user list
+    const userListEl = document.getElementById('active-users-list');
+    if (userListEl) {
+        userListEl.innerHTML = '';
+        users.forEach(function(username) {
+            const userItem = document.createElement('div');
+            userItem.classList.add('user-item');
+            userItem.innerHTML = '<span class="user-dot">●</span> ' + username;
+            userListEl.appendChild(userItem);
+        });
+    }
 }

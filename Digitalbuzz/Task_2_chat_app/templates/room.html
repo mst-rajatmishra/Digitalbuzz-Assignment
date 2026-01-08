@@ -17,6 +17,15 @@
             <div class="room-info">
                 <h3>Room: {{ room.name }}</h3>
                 <p>Active now: <span id="active-count">1</span></p>
+                
+                <div class="active-users">
+                    <h4>Active Users:</h4>
+                    <div id="active-users-list">
+                        <div class="user-item">
+                            <span class="user-dot">●</span> {{ username }}
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div class="notification-area" id="notification-area">

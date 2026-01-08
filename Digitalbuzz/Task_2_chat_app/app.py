@@ -23,8 +23,8 @@ def create_app():
 app = create_app()
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-# Simple user management (for demo only)
-users = {}
+# Track active users in each room
+active_users = {}  # {room_id: {session_id: username}}
 
 @app.route('/')
 def home():
@@ -80,7 +80,8 @@ def room(room_id):
     return render_template('room.html', 
                            room=room, 
                            messages=messages,
-                           username=session['username'])
+                           username=session['username'],
+                           user_id=session['user_id'])
 
 @app.route('/messages/<int:room_id>')
 def get_messages(room_id):
@@ -114,29 +115,76 @@ def handle_connect():
 def handle_disconnect():
     if 'username' in session:
         print(f"User {session['username']} disconnected")
+        
+        # Remove user from all rooms they were in
+        for room_id in list(active_users.keys()):
+            if request.sid in active_users[room_id]:
+                username = active_users[room_id][request.sid]
+                del active_users[room_id][request.sid]
+                
+                # Get updated list
+                users_in_room = list(active_users[room_id].values())
+                
+                # Broadcast to room
+                emit('notification', {
+                    'message': f"{username} has disconnected",
+                    'type': 'leave'
+                }, room=room_id)
+                
+                emit('user_list_update', {
+                    'users': users_in_room,
+                    'count': len(users_in_room)
+                }, room=room_id)
 
 @socketio.on('join')
 def handle_join(data):
-    room_id = data['room_id']
+    room_id = str(data['room_id'])
     join_room(room_id)
     print(f"User {session['username']} joined room {room_id}")
+    
+    # Track active user
+    if room_id not in active_users:
+        active_users[room_id] = {}
+    active_users[room_id][request.sid] = session['username']
+    
+    # Get list of users in room
+    users_in_room = list(active_users[room_id].values())
     
     # Broadcast notification
     emit('notification', {
         'message': f"{session['username']} has joined the room",
         'type': 'join'
     }, room=room_id)
+    
+    # Broadcast updated user list to everyone in room
+    emit('user_list_update', {
+        'users': users_in_room,
+        'count': len(users_in_room)
+    }, room=room_id)
 
 @socketio.on('leave')
 def handle_leave(data):
-    room_id = data['room_id']
+    room_id = str(data['room_id'])
     leave_room(room_id)
     print(f"User {session['username']} left room {room_id}")
+    
+    # Remove user from active users
+    if room_id in active_users and request.sid in active_users[room_id]:
+        del active_users[room_id][request.sid]
+    
+    # Get updated list
+    users_in_room = list(active_users.get(room_id, {}).values())
     
     # Broadcast notification
     emit('notification', {
         'message': f"{session['username']} has left the room",
         'type': 'leave'
+    }, room=room_id)
+    
+    # Broadcast updated user list
+    emit('user_list_update', {
+        'users': users_in_room,
+        'count': len(users_in_room)
     }, room=room_id)
 
 @socketio.on('message')
